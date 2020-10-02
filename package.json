@@ -1,0 +1,23 @@
+{
+  "name": "ts-rest-client",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.ts",
+  "scripts": {
+    "start": "tsc && node specs/test.js"
+  },
+  "keywords": [
+    "rest",
+    "client",
+    "typescript",
+    "interface",
+    "dynamic"
+  ],
+  "author": "Baryo Bar Yosef",
+  "license": "MIT",
+  "dependencies": {
+    "@types/jasmine": "^3.5.14",
+    "jasmine": "^3.6.1",
+    "typescript": "beta"
+  }
+}
