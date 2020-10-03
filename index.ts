@@ -1,19 +1,10 @@
-import {
-    AllEntityOps,
-    CreateEntityOp,
-    CRUDEntity,
-    DeleteEntityOp, Entity,
-    GetAllEntitiesOp,
-    GetEntityOp,
-    InferEntityId, ReadOnlyOps,
-    UpdateEntityOp
-} from "./RESTEntity";
+import {AllEntityApi, EntityApi, InferEntityId} from "./EntityApi";
 import {HttpClient} from "./HttpClient";
 
 export function init(httpClient: HttpClient, rootPath = '') {
-    function clientFor<T extends CRUDEntity<any, any, any>>(pathSegments: string[]): T {
+    function clientFor<T extends EntityApi<any, any, any>>(pathSegments: string[]): T {
         return new Proxy({} as T, {
-            get(target: T, p: AllEntityOps<any> & keyof T) {
+            get(target: T, p: AllEntityApi<any> & keyof T) {
                 const path = pathSegments.join('/');
                 switch (p) {
                     case "create":
@@ -41,7 +32,7 @@ export function init(httpClient: HttpClient, rootPath = '') {
     }
 
     return {
-        createClient: <T extends CRUDEntity<any, any, any>>() => clientFor<T>([rootPath])
+        createClient: <T extends EntityApi<any, any, any>>() => clientFor<T>([rootPath])
     };
 }
 

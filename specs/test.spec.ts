@@ -1,4 +1,4 @@
-import {CRUDEntity, Entity, Id} from "../RESTEntity";
+import {EntityApi, Entity, Id} from "../EntityApi";
 import {init} from "../index";
 import {HttpBodyRequestFn, HttpClient, HttpRequestFn} from "../HttpClient";
 import {genId, normalizeParams, padArray, paramsLengthWithBody} from "./utils";
@@ -54,7 +54,7 @@ describe('testing client', () => {
     });
 
     it('should provide basic crud methods', function () {
-        const cli = factory.createClient<CRUDEntity<Entity & { f1: number; }>>();
+        const cli = factory.createClient<EntityApi<Entity & { f1: number; }>>();
 
         expect(cli.create).toBeDefined();
         cli.create({id: genId(), f1: 42}).then(e => e.f1);
@@ -79,12 +79,12 @@ describe('testing client', () => {
         const nestingLevel = 3;
 
         function getClient() {
-            return factory.createClient<CRUDEntity<Entity & { f1: number }, {
-                nest1: CRUDEntity<Entity & { f2: number }, {
-                    nest2: CRUDEntity<Entity & { f4: number }, {
-                        nest3: CRUDEntity<Entity & { f5: number }>
+            return factory.createClient<EntityApi<Entity & { f1: number }, {
+                nest1: EntityApi<Entity & { f2: number }, {
+                    nest2: EntityApi<Entity & { f4: number }, {
+                        nest3: EntityApi<Entity & { f5: number }>
                     }>
-                    nest2_2: CRUDEntity<Entity & { f3: number }>,
+                    nest2_2: EntityApi<Entity & { f3: number }>,
                 }>
             }>>()
         }
