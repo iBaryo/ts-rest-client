@@ -32,5 +32,5 @@ export type GeneralEntityApi<T extends EntityDef> =
 export type AllEntityApi<T extends EntityDef> =
     SingleEntityApi<T> & GeneralEntityApi<T>;
 
-export type ReadOnlyApi<T extends EntityDef> =
+export type ReadOnlyApi<T extends EntityDef = EntityDef> =
     GetEntityApi<T> & GetAllEntitiesApi<T>;

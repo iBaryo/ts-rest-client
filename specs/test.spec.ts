@@ -1,10 +1,10 @@
-import {init,HttpClient, EntityApi, Entity, Id, EntityDef} from "../index";
+import {wrap, HttpClient, EntityApi, Entity, Id, EntityDef, ReadOnlyApi} from "../index";
 import {HttpBodyRequestFn, HttpRequestFn} from "../HttpClient";
 import {genId, normalizeParams, padArray, paramsLengthWithBody} from "./utils";
 
 describe('testing client', () => {
     const mockRoot = `/api`;
-    let factory: ReturnType<typeof init>;
+    let factory: ReturnType<typeof wrap>;
     let mockHttpClient: HttpClient;
 
     interface HttpRequest<K extends keyof HttpClient> {
@@ -18,10 +18,10 @@ describe('testing client', () => {
     function getClient() {
         return factory.createClient<EntityApi<EntityDef<Entity & { f1: number }>, {
             nest1: EntityApi<EntityDef<Entity & { f2: number }>, {
-                nest2: EntityApi<EntityDef<Entity & { f4: number }>, {
-                    nest3: EntityApi<EntityDef<Entity & { f5: number; serverOnlyField: string }, 'id'|'serverOnlyField'>>
+                nest2: EntityApi<EntityDef<Entity & { f3: number }>, {
+                    nest3: EntityApi<EntityDef<Entity & { f4: number; serverOnlyField: string }, 'id'|'serverOnlyField'>>
                 }>
-                nest2_2: EntityApi<EntityDef<Entity & { f3: number }>>,
+                nest2_2: EntityApi<EntityDef<Entity & { f5: number }>, {}, ReadOnlyApi<EntityDef<Entity & { f5: number }>>>,
             }>
         }>>()
     }
@@ -54,7 +54,7 @@ describe('testing client', () => {
                 } as HttpRequest<'put'>]
             })
         };
-        factory = init(mockHttpClient, mockRoot);
+        factory = wrap(mockHttpClient, mockRoot);
     });
 
     it('should create a simple client', function () {
@@ -86,8 +86,11 @@ describe('testing client', () => {
 
         // nested:
         const entity = single.nest1.for(genId()).nest2.for(genId()).nest3;
-        entity.create({f5: 42})
-        entity.for(genId()).update({f5: 43}).then(e => e.serverOnlyField);
+        entity.create({f4: 42})
+        entity.for(genId()).update({f4: 43}).then(e => e.serverOnlyField);
+
+        // allowed apis
+        single.nest1.for('').nest2_2.for('').get().then(x => x.f5);
     });
 
     describe('deep nesting', function () {

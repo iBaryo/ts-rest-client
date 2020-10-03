@@ -2,7 +2,7 @@ import {EntityApi, InferEntityId} from "./interfaces/EntityApi";
 import {HttpClient} from "./HttpClient";
 import {AllEntityApi} from "./interfaces/EntityApiTypes";
 
-export function init(httpClient: HttpClient, rootPath = '') {
+export function wrap(httpClient: HttpClient, rootPath = '') {
     function clientFor<T extends EntityApi<any, any, any>>(pathSegments: string[]): T {
         return new Proxy({} as T, {
             get(target: T, p: AllEntityApi<any> & keyof T) {
