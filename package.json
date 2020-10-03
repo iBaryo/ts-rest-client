@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.ts",
   "scripts": {
-    "start": "tsc && node specs/test.js"
+    "test": "tsc && jasmine specs/test.spec.js"
   },
   "keywords": [
     "rest",
@@ -15,7 +15,7 @@
   ],
   "author": "Baryo Bar Yosef",
   "license": "MIT",
-  "dependencies": {
+  "devDependencies": {
     "@types/jasmine": "^3.5.14",
     "jasmine": "^3.6.1",
     "typescript": "beta"
