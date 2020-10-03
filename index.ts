@@ -1,17 +1,17 @@
 import {
     AllEntityOps,
-    CreateEntity,
+    CreateEntityOp,
     CRUDEntity,
-    DeleteEntity, Entity,
-    GetEntities,
-    GetEntity,
-    GetEntityId, ReadOnlyOps,
-    UpdateEntity
+    DeleteEntityOp, Entity,
+    GetAllEntitiesOp,
+    GetEntityOp,
+    InferEntityId, ReadOnlyOps,
+    UpdateEntityOp
 } from "./RESTEntity";
 import {HttpClient} from "./HttpClient";
 
 export function init(httpClient: HttpClient, rootPath = '') {
-    function clientFor<T extends CRUDEntity>(pathSegments: string[]): T {
+    function clientFor<T extends CRUDEntity<any, any, any>>(pathSegments: string[]): T {
         return new Proxy({} as T, {
             get(target: T, p: AllEntityOps<any> & keyof T) {
                 const path = pathSegments.join('/');
@@ -26,7 +26,7 @@ export function init(httpClient: HttpClient, rootPath = '') {
                     case "delete":
                         return () => httpClient.delete(path);
                     case "for":
-                        return (...id: [GetEntityId<T>, ...GetEntityId<T>[]]) => clientFor([
+                        return (...id: [InferEntityId<T>, ...InferEntityId<T>[]]) => clientFor([
                             ...pathSegments,
                             ...id
                         ]);
@@ -41,7 +41,7 @@ export function init(httpClient: HttpClient, rootPath = '') {
     }
 
     return {
-        createClient: <T extends CRUDEntity>() => clientFor<T>([rootPath])
+        createClient: <T extends CRUDEntity<any, any, any>>() => clientFor<T>([rootPath])
     };
 }
 
