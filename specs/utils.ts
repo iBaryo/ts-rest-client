@@ -1,8 +1,10 @@
 import {HttpBodyRequestFn, HttpRequestFn} from "../HttpClient";
 
-export function normalizeParams(...args: Parameters<HttpBodyRequestFn|HttpRequestFn>) {
+export const paramsLengthWithBody = 4;
+
+export function normalizeParams(...args: Parameters<HttpBodyRequestFn>|Parameters<HttpRequestFn>) {
     function isWithBody(test: typeof args): test is Parameters<HttpBodyRequestFn> {
-        return test.length == 4;
+        return test.length == paramsLengthWithBody;
     }
 
     if (isWithBody(args))
@@ -21,5 +23,9 @@ export function normalizeParams(...args: Parameters<HttpBodyRequestFn|HttpReques
 }
 
 let _id: number;
-export const mockId: (() => string)&{reset(): void} = () => `mockId${_id}`;
-mockId.reset = () => _id = 1;
+export const genId: (() => string)&{reset(): void} = () => `mockId${_id++}`;
+genId.reset = () => _id = 1;
+
+export function padArray<T extends Array<any>>(arr: T, size: number): T {
+    return arr.concat(new Array(size - arr.length).fill(undefined)) as T;
+}
