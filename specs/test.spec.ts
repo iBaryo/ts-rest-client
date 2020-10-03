@@ -1,4 +1,4 @@
-import {EntityApi, Entity, Id} from "../EntityApi";
+import {EntityApi, Entity, Id, EntityDef} from "../EntityApi";
 import {init} from "../index";
 import {HttpBodyRequestFn, HttpClient, HttpRequestFn} from "../HttpClient";
 import {genId, normalizeParams, padArray, paramsLengthWithBody} from "./utils";
@@ -14,6 +14,17 @@ describe('testing client', () => {
         body?: object;
         query?: object;
         headers?: Record<string, string>;
+    }
+
+    function getClient() {
+        return factory.createClient<EntityApi<EntityDef<Entity & { f1: number }>, {
+            nest1: EntityApi<EntityDef<Entity & { f2: number }>, {
+                nest2: EntityApi<EntityDef<Entity & { f4: number }>, {
+                    nest3: EntityApi<EntityDef<Entity & { f5: number; serverOnlyField: string }, 'id'|'serverOnlyField'>>
+                }>
+                nest2_2: EntityApi<EntityDef<Entity & { f3: number }>>,
+            }>
+        }>>()
     }
 
     beforeEach(() => {
@@ -54,10 +65,10 @@ describe('testing client', () => {
     });
 
     it('should provide basic crud methods', function () {
-        const cli = factory.createClient<EntityApi<Entity & { f1: number; }>>();
+        const cli = getClient();
 
         expect(cli.create).toBeDefined();
-        cli.create({id: genId(), f1: 42}).then(e => e.f1);
+        cli.create({f1: 42}).then(e => e.f1);
 
         expect(cli.getAll).toBeDefined();
         cli.getAll().then(es => es.map(e => e.f1));
@@ -68,26 +79,21 @@ describe('testing client', () => {
         single.get().then(e => e.f1);
 
         expect(cli.for(genId()).update).toBeDefined();
-        single.update({id: genId(), f1: 42}).then(e => e.f1);
+        single.update({f1: 42}).then(e => e.f1);
 
         expect(cli.for(genId()).delete).toBeDefined();
         single.delete().then(() => {
         });
+
+        // nested:
+        const entity = single.nest1.for(genId()).nest2.for(genId()).nest3;
+        entity.create({f5: 42})
+        entity.for(genId()).update({f5: 43}).then(e => e.serverOnlyField);
     });
 
     describe('deep nesting', function () {
         const nestingLevel = 3;
 
-        function getClient() {
-            return factory.createClient<EntityApi<Entity & { f1: number }, {
-                nest1: EntityApi<Entity & { f2: number }, {
-                    nest2: EntityApi<Entity & { f4: number }, {
-                        nest3: EntityApi<Entity & { f5: number }>
-                    }>
-                    nest2_2: EntityApi<Entity & { f3: number }>,
-                }>
-            }>>()
-        }
 
         function expectResponse(res: object | void) {
             return {

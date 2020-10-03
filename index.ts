@@ -8,14 +8,14 @@ export function init(httpClient: HttpClient, rootPath = '') {
                 const path = pathSegments.join('/');
                 switch (p) {
                     case "create":
-                        return (payload) => httpClient.post(path, payload);
+                        return (...args) => httpClient.post(path, ...args);
                     case "getAll":
                     case "get":
-                        return () => httpClient.get(path);
+                        return (...args) => httpClient.get(path, ...args);
                     case "update":
-                        return (payload) => httpClient.put(path, payload)
+                        return (...args) => httpClient.put(path, ...args);
                     case "delete":
-                        return () => httpClient.delete(path);
+                        return (...args) => httpClient.delete(path, ...args);
                     case "for":
                         return (...id: [InferEntityId<T>, ...InferEntityId<T>[]]) => clientFor([
                             ...pathSegments,
