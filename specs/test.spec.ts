@@ -1,6 +1,5 @@
-import {EntityApi, Entity, Id, EntityDef} from "../EntityApi";
-import {init} from "../index";
-import {HttpBodyRequestFn, HttpClient, HttpRequestFn} from "../HttpClient";
+import {init,HttpClient, EntityApi, Entity, Id, EntityDef} from "../index";
+import {HttpBodyRequestFn, HttpRequestFn} from "../HttpClient";
 import {genId, normalizeParams, padArray, paramsLengthWithBody} from "./utils";
 
 describe('testing client', () => {
