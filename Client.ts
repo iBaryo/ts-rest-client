@@ -1,13 +1,14 @@
-import {EntityApi, InferEntityId} from "./interfaces/EntityApi";
+import {InferEntityId, EntityApiOrContainer, PeakerProps} from "./interfaces/EntityApi";
 import {HttpClient} from "./HttpClient";
 import {AllEntityApi} from "./interfaces/EntityApiTypes";
 
 export function wrap(httpClient: HttpClient, rootPath = '') {
-    function clientFor<T extends EntityApi<any, any, any>>(pathSegments: string[]): T {
+    function clientFor<T extends EntityApiOrContainer>(pathSegments: string[]): T {
         return new Proxy({} as T, {
-            get(target: T, p: AllEntityApi<any> & keyof T) {
+            get(target: T, p: keyof (AllEntityApi<any> & T & PeakerProps<any>)) {
                 const path = pathSegments.filter(Boolean).join('/');
                 switch (p) {
+                    // case "create":
                     case "create":
                         return (...args) => httpClient.post(path, ...args);
                     case "getAll":
@@ -22,6 +23,8 @@ export function wrap(httpClient: HttpClient, rootPath = '') {
                             ...pathSegments,
                             ...id
                         ]);
+                    case "id":
+                        return pathSegments[pathSegments.length - 1];
                     default:
                         return clientFor([
                             ...pathSegments,
@@ -33,7 +36,7 @@ export function wrap(httpClient: HttpClient, rootPath = '') {
     }
 
     return {
-        createClient: <T extends EntityApi<any, any, any>>() => clientFor<T>([rootPath])
+        createClient: <T extends EntityApiOrContainer>() => clientFor<T>([rootPath])
     };
 }
 
