@@ -6,7 +6,7 @@ export function wrap(httpClient: HttpClient, rootPath = '') {
     function clientFor<T extends EntityApi<any, any, any>>(pathSegments: string[]): T {
         return new Proxy({} as T, {
             get(target: T, p: AllEntityApi<any> & keyof T) {
-                const path = pathSegments.join('/');
+                const path = pathSegments.filter(Boolean).join('/');
                 switch (p) {
                     case "create":
                         return (...args) => httpClient.post(path, ...args);

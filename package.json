@@ -2,7 +2,7 @@
   "name": "ts-rest-client",
   "version": "1.0.0",
   "description": "",
-  "main": "Client.ts",
+  "main": "index.js",
   "scripts": {
     "test": "tsc && jasmine specs/test.spec.js"
   },
