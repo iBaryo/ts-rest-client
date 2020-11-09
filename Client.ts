@@ -1,11 +1,11 @@
-import {InferEntityId, EntityApiOrContainer, PeakerProps} from "./interfaces/EntityApi";
+import {InferEntityId, EntityApiOrContainer, AccessSingleEntityApi} from "./interfaces/EntityApi";
 import {HttpClient} from "./HttpClient";
 import {AllEntityApi} from "./interfaces/EntityApiTypes";
 
 export function wrap(httpClient: HttpClient, rootPath = '') {
     function clientFor<T extends EntityApiOrContainer>(pathSegments: string[]): T {
-        return new Proxy({} as T, {
-            get(target: T, p: keyof (AllEntityApi<any> & T & PeakerProps<any>)) {
+        return new Proxy({}, {
+            get(target: T, p: keyof (AllEntityApi & T & AccessSingleEntityApi)) {
                 const path = pathSegments.filter(Boolean).join('/');
                 switch (p) {
                     // case "create":
@@ -19,12 +19,10 @@ export function wrap(httpClient: HttpClient, rootPath = '') {
                     case "delete":
                         return (...args) => httpClient.delete(path, ...args);
                     case "for":
-                        return (...id: [InferEntityId<T>, ...InferEntityId<T>[]]) => clientFor([
+                        return (...id: [InferEntityId<T>, ...InferEntityId<T>[]]) => clientFor<T>([
                             ...pathSegments,
                             ...id
                         ]);
-                    case "id":
-                        return pathSegments[pathSegments.length - 1];
                     default:
                         return clientFor([
                             ...pathSegments,
@@ -32,7 +30,7 @@ export function wrap(httpClient: HttpClient, rootPath = '') {
                         ]);
                 }
             }
-        });
+        }) as T;
     }
 
     return {

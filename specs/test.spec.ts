@@ -19,7 +19,7 @@ describe('testing client', () => {
         return factory.createClient<EntityApi<EntityDef<Entity & { f1: number }>, {
             nest1: EntityApi<EntityDef<Entity & { f2: number }>, {
                 nest2: EntityApi<EntityDef<Entity & { f3: number }>, {
-                    nest3: EntityApi<EntityDef<Entity & { f4: number; serverOnlyField: string }, 'id'|'serverOnlyField'>>
+                    nest3: EntityApi<EntityDef<Entity & { f4: number; serverOnlyField: string }, 'id' | 'serverOnlyField'>>
                 }>
                 nest2_2: EntityApi<EntityDef<Entity & { f5: number }>, {}, ReadOnlyApi<EntityDef<Entity & { f5: number }>>>,
             }>
@@ -60,7 +60,6 @@ describe('testing client', () => {
     it('should create a simple client', function () {
         const cli = factory.createClient();
         expect(cli).toBeDefined();
-        expect(cli.for).toEqual(jasmine.any(Function));
     });
 
     it('should provide basic crud methods', function () {
@@ -85,6 +84,7 @@ describe('testing client', () => {
         });
 
         // nested:
+        single.nest1.create({f2: 13});
         const entity = single.nest1.for(genId()).nest2.for(genId()).nest3;
         entity.create({f4: 42})
         entity.for(genId()).update({f4: 43}).then(e => e.serverOnlyField);

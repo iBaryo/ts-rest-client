@@ -4,10 +4,12 @@ export interface Entity<T = Id> {
     id: T;
 }
 
-export type EntityDef<T extends Entity = Entity,
-    ServerOnlyFields extends keyof T = 'id',
+type DefaultServerFields<T> = T extends Entity ? 'id' : never;
+
+export type EntityDef<T extends object = object,
+    ServerOnlyFields extends keyof T = never,
     CreateOnlyFields extends keyof T = ServerOnlyFields> = {
     type: T;
-    createPayload: Omit<T, ServerOnlyFields>
-    updatePayload: Omit<T, ServerOnlyFields | CreateOnlyFields>;
+    createPayload: Omit<T, DefaultServerFields<T> | ServerOnlyFields>
+    updatePayload: Omit<T, DefaultServerFields<T> | ServerOnlyFields | CreateOnlyFields>;
 };
