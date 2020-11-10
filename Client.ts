@@ -1,6 +1,7 @@
-import {InferEntityId, EntityApiOrContainer, AccessSingleEntityApi} from "./interfaces/EntityApi";
+import {InferEntityId, EntityApiOrContainer} from "./interfaces/EntityApi";
 import {HttpClient} from "./HttpClient";
 import {AllEntityApi} from "./interfaces/EntityApiTypes";
+import {AccessSingleEntityApi} from "./interfaces/SelectApis";
 
 export function wrap(httpClient: HttpClient, rootPath = '') {
     function clientFor<T extends EntityApiOrContainer>(pathSegments: string[]): T {
