@@ -1,55 +1,49 @@
 import {AllEntityApi, GeneralEntityApi, GetAllApi, SingleEntityApi} from "./EntityApiTypes";
-import {AtLeastOne, Promisify} from "./Utils";
+import {AtLeastOne} from "./Utils";
 import {Entity, EntityDef, Id} from "./Entity";
 import {EntityApi} from "./EntityApi";
 
-type SelectApis<
-    SelectedApis extends Partial<AllEntityApi>,
-    FromApis extends string,
+export type SelectApis<EDef extends EntityDef,
+    SelectedApis extends Partial<AllEntityApi<EDef>>,
+    FromApis extends keyof SelectedApis,
     > = Pick<SelectedApis, Extract<keyof SelectedApis, FromApis>>;
 
-type SelectPromisifiedApis<
-    SelectedApis extends Partial<AllEntityApi>,
-    FromApis extends string
-    > =
-    Promisify<SelectApis<SelectedApis, FromApis>>;
 
-type SelectGeneralApis<
-    SelectedApis extends Partial<AllEntityApi>,
+// export type SelectPromisifiedApis<EDef extends EntityDef,
+//     SelectedApis extends Partial<AllEntityApi<EDef>>,
+//     FromApis extends string> =
+//     Promisify<SelectApis<EDef, SelectedApis, FromApis>>;
+
+export type SelectGeneralApis<EDef extends EntityDef,
+    SelectedApis extends Partial<AllEntityApi<EDef>>,
     > =
-    SelectPromisifiedApis<SelectedApis, keyof GeneralEntityApi<EntityDef>>;
+    SelectApis<EDef, SelectedApis, keyof GeneralEntityApi<EntityDef>>;
 
 export type SelectAccessGeneralEntityApi<
     EDef extends EntityDef,
-    SelectedApis extends Partial<AllEntityApi>,
+    SelectedApis extends Partial<AllEntityApi<EDef>>,
     > =
-    EDef extends EntityDef<infer E, any, any> ?
-        E extends Entity<infer ID> ?
-            SelectGeneralApis<SelectedApis>
-            : SelectGeneralApis<
-                SelectApis<SelectedApis,
-                    Exclude<keyof GeneralEntityApi<EntityDef>, keyof GetAllApi>>>
-        : never;
+    SelectedApis extends Partial<AllEntityApi<EntityDef<Entity<infer ID>>>> ?
+        SelectGeneralApis<EDef, SelectedApis>
+        : SelectGeneralApis<EDef,
+            SelectApis<EDef, SelectedApis,
+                keyof Omit<GeneralEntityApi<EntityDef>, keyof GetAllApi>>>;
 
-type SelectSingleApis<
-    SelectedApis extends Partial<AllEntityApi<EntityDef>>,
-    SubEntities extends Record<string, EntityApi<any, any, any>> = {}
-    > =
-    SelectPromisifiedApis<SelectedApis, keyof SingleEntityApi<EntityDef>>
+type SelectSingleApis<EDef extends EntityDef,
+    SelectedApis extends Partial<AllEntityApi<EDef>>,
+    SubEntities extends Record<string, EntityApi<any, any, any>> = {}> =
+    SelectApis<EDef, SelectedApis, keyof SingleEntityApi<EntityDef>>
     & SubEntities;
 
-export type AccessSingleEntityApi<
-    SelectedApis extends Partial<AllEntityApi<EntityDef>> = AllEntityApi<EntityDef>,
-    SubEntities extends Record<string, EntityApi<any, any, any>> = {},
-    >  = { for(...id: AtLeastOne<Id>): SelectSingleApis<SelectedApis, SubEntities>; };
+export type AccessSingleEntityApi<EDef extends EntityDef,
+    SelectedApis extends Partial<AllEntityApi<EDef>>,
+    SubEntities extends Record<string, EntityApi<EntityDef, any, any>>,
+    > = { for(...id: AtLeastOne<Id>): SelectSingleApis<EDef, SelectedApis, SubEntities>; };
 
-export type SelectAccessSingleEntityApi<
-    EDef extends EntityDef,
-    SelectedApis extends Partial<AllEntityApi<EntityDef>>,
-    SubEntities extends Record<string, EntityApi<any, any, any>>,
+export type SelectAccessSingleEntityApi<EDef extends EntityDef,
+    SelectedApis extends Partial<AllEntityApi<EDef>>,
+    SubEntities extends Record<string, EntityApi<EntityDef, any, any>> = {},
     > =
-    EDef extends EntityDef<infer E, any, any> ?
-        E extends Entity<infer ID> ?
-            AccessSingleEntityApi<SelectedApis, SubEntities>
-            : SelectSingleApis<SelectedApis, SubEntities>
-        : never;
+    SelectedApis extends Partial<AllEntityApi<EntityDef<Entity<infer ID>>>> ?
+        AccessSingleEntityApi<EDef, SelectedApis, SubEntities>
+        : SelectSingleApis<EDef, SelectedApis, SubEntities>;

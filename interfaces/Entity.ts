@@ -10,6 +10,6 @@ export type EntityDef<T extends object = object,
     ServerOnlyFields extends keyof T = never,
     CreateOnlyFields extends keyof T = ServerOnlyFields> = {
     type: T;
-    createPayload: Omit<T, DefaultServerFields<T> | ServerOnlyFields>
+    createPayload: Omit<T, DefaultServerFields<T> | ServerOnlyFields>;
     updatePayload: Omit<T, DefaultServerFields<T> | ServerOnlyFields | CreateOnlyFields>;
 };

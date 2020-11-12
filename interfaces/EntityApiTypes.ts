@@ -4,23 +4,23 @@ import {EntityDef} from "./Entity";
 export type Api = {}
 
 export interface DeleteApi<R = void> extends Api {
-    delete(...args: HttpCommonParams): R;
+    delete(...args: HttpCommonParams): Promise<R>;
 }
 
 export interface CreateApi<T extends EntityDef = EntityDef> extends Api {
-    create(...args: HttpCommonParamsWithBody<T['createPayload']>): T['type'];
+    create(entity: T['createPayload'], ...args: HttpCommonParams): Promise<T['type']>;
 }
 
 export interface GetApi<T extends EntityDef = EntityDef> extends Api {
-    get(...args: HttpCommonParams): T['type'];
+    get(...args: HttpCommonParams): Promise<T['type']>;
 }
 
 export interface GetAllApi<T extends EntityDef = EntityDef> extends Api {
-    getAll(...args: HttpCommonParams): Array<T['type']>;
+    getAll(...args: HttpCommonParams): Promise<Array<T['type']>>;
 }
 
 export interface UpdateApi<T extends EntityDef> extends Api {
-    update(...args: HttpCommonParamsWithBody<T['updatePayload']>): T['type'];
+    update(entity: T['updatePayload'], ...args: HttpCommonParams): Promise<T['type']>;
 }
 
 export type SingleEntityApi<T extends EntityDef> =
