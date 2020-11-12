@@ -35,9 +35,9 @@ type SelectSingleApis<EDef extends EntityDef,
     SelectApis<EDef, SelectedApis, keyof SingleEntityApi<EntityDef>>
     & SubEntities;
 
-export type AccessSingleEntityApi<EDef extends EntityDef,
-    SelectedApis extends Partial<AllEntityApi<EDef>>,
-    SubEntities extends Record<string, EntityApi<EntityDef, any, any>>,
+export type AccessSingleEntityApi<EDef extends EntityDef = EntityDef,
+    SelectedApis extends Partial<AllEntityApi<EDef>> = AllEntityApi<EDef>,
+    SubEntities extends Record<string, EntityApi<EntityDef, any, any>> = {},
     > = { for(...id: AtLeastOne<Id>): SelectSingleApis<EDef, SelectedApis, SubEntities>; };
 
 export type SelectAccessSingleEntityApi<EDef extends EntityDef,
