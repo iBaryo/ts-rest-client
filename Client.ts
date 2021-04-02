@@ -6,10 +6,10 @@ import {AccessSingleEntityApi} from "./interfaces/SelectApis";
 export function wrap(httpClient: HttpClient, rootPath = '') {
     function clientFor<T extends EntityApiOrContainer>(pathSegments: string[]): T {
         return new Proxy({}, {
-            get(target: T, p: keyof (AllEntityApi & T & AccessSingleEntityApi)) {
+            get(target: T, p: string, receiver: any) {
+                const prop = p as keyof (AllEntityApi & T & AccessSingleEntityApi);
                 const path = pathSegments.filter(Boolean).join('/');
-                switch (p) {
-                    // case "create":
+                switch (prop) {
                     case "create":
                         return (...args) => httpClient.post(path, ...args);
                     case "getAll":
